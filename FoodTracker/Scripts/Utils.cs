@@ -40,7 +40,7 @@
             { Macros.Fat, Unit.grams }
         };
 
-        public static string macroToUnitAbbv(Macros macro)
+        public static string MacroToUnitAbbv(Macros macro)
         {
             return (unitToAbbreviation[macrosToUnit[macro]]);
         }

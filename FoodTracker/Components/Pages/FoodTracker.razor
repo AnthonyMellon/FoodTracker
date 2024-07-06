@@ -8,31 +8,35 @@
 
 <h3>Welcome to your food tracker</h3>
 
+<!-- Add food items to the list -->
 <InputSelect @bind-Value:get="selectedFood" @bind-Value:set="SetSelectedFood">
     <option value="" disabled selected>Add an item</option>
-    @foreach (FoodItem foodItem in DebugUtils.dummyFoods)
+    @foreach (FoodItem foodItem in DebugUtils.DummyFoods)
     {
         <option value="@foodItem.name">@foodItem</option>
     }
 </InputSelect>
 
+<!-- List each food item added to the list -->
 @foreach (FoodItem foodItem in foodItems)
 {  
     <div>
         <label>>@foodItem</label>
         <div>Calroies: @foodItem.calories</div>
-        <div>Protein: @foodItem.protein.value@Utils.macroToUnitAbbv(Macros.Protein)</div>
-        <div>Carbs: @foodItem.carbs.value@Utils.macroToUnitAbbv(Macros.Carb)</div>
-        <div>Fat: @foodItem.fat.value@Utils.macroToUnitAbbv(Macros.Fat)</div>
+        <div>Protein: @foodItem.protein.value@Utils.MacroToUnitAbbv(Macros.Protein)</div>
+        <div>Carbs: @foodItem.carbs.value@Utils.MacroToUnitAbbv(Macros.Carb)</div>
+        <div>Fat: @foodItem.fat.value@Utils.MacroToUnitAbbv(Macros.Fat)</div>
     </div>
     <hr />
 }
+
+<!-- Disaply totals -->
 <div>
     <label>Totals</label>
     <div>Calroies: @foodItems.Sum(i => i.calories)</div>
-    <div>Protein: @foodItems.Sum(i => i.protein.value)@Utils.macroToUnitAbbv(Macros.Protein)</div>
-    <div>Carbs: @foodItems.Sum(i => i.carbs.value)@Utils.macroToUnitAbbv(Macros.Carb)</div>
-    <div>Fat: @foodItems.Sum(i => i.fat.value)@Utils.macroToUnitAbbv(Macros.Fat)</div>
+    <div>Protein: @foodItems.Sum(i => i.protein.value)@Utils.MacroToUnitAbbv(Macros.Protein)</div>
+    <div>Carbs: @foodItems.Sum(i => i.carbs.value)@Utils.MacroToUnitAbbv(Macros.Carb)</div>
+    <div>Fat: @foodItems.Sum(i => i.fat.value)@Utils.MacroToUnitAbbv(Macros.Fat)</div>
 </div>
  
 
@@ -43,22 +47,10 @@
     private void SetSelectedFood(string? selected)
     {
         if (selected == null) return;
-        else Console.WriteLine($"Selected {selected}");
 
-        FoodItem? selectedItem = (DebugUtils.dummyFoods.Find(e => e.name == selected));
+        //Find and add the selected food item
+        FoodItem? selectedItem = (DebugUtils.DummyFoods.Find(e => e.name == selected));
         if (selectedItem != null) foodItems.Add(selectedItem);
-    }
-
-    private float GetTotalProtein(List<FoodItem> foodItems)
-    {
-        float total = 0;
-
-        foreach(FoodItem foodItem in foodItems)
-        {
-            total += foodItem.protein.value;
-        }
-
-        return total;
     }
 
     private List<FoodItem> foodItems = new List<FoodItem>();

@@ -2,7 +2,7 @@
 {
     public static class DebugUtils
     {
-        public static List<FoodItem> dummyFoods = new List<FoodItem>()
+        public static List<FoodItem> DummyFoods = new List<FoodItem>()
         {
             new FoodItem("Protein_Thing", 100, 10, 0, 0),
             new FoodItem("Carb_Thing", 100, 0, 10, 0),
