@@ -1,0 +1,65 @@
+﻿@page "/FoodTracker"
+@using global::FoodTracker.Scripts
+@rendermode InteractiveServer
+
+<link href="./Styles/FoodTracker.css" rel="stylesheet"/>
+
+<PageTitle>Foood Tracker</PageTitle>
+
+<h3>Welcome to your food tracker</h3>
+
+<InputSelect @bind-Value:get="selectedFood" @bind-Value:set="SetSelectedFood">
+    <option value="" disabled selected>Add an item</option>
+    @foreach (FoodItem foodItem in DebugUtils.dummyFoods)
+    {
+        <option value="@foodItem.name">@foodItem</option>
+    }
+</InputSelect>
+
+@foreach (FoodItem foodItem in foodItems)
+{  
+    <div>
+        <label>>@foodItem</label>
+        <div>Calroies: @foodItem.calories</div>
+        <div>Protein: @foodItem.protein.value@Utils.macroToUnitAbbv(Macros.Protein)</div>
+        <div>Carbs: @foodItem.carbs.value@Utils.macroToUnitAbbv(Macros.Carb)</div>
+        <div>Fat: @foodItem.fat.value@Utils.macroToUnitAbbv(Macros.Fat)</div>
+    </div>
+    <hr />
+}
+<div>
+    <label>Totals</label>
+    <div>Calroies: @foodItems.Sum(i => i.calories)</div>
+    <div>Protein: @foodItems.Sum(i => i.protein.value)@Utils.macroToUnitAbbv(Macros.Protein)</div>
+    <div>Carbs: @foodItems.Sum(i => i.carbs.value)@Utils.macroToUnitAbbv(Macros.Carb)</div>
+    <div>Fat: @foodItems.Sum(i => i.fat.value)@Utils.macroToUnitAbbv(Macros.Fat)</div>
+</div>
+ 
+
+@code
+{
+    public string? selectedFood { get; private set; }
+
+    private void SetSelectedFood(string? selected)
+    {
+        if (selected == null) return;
+        else Console.WriteLine($"Selected {selected}");
+
+        FoodItem? selectedItem = (DebugUtils.dummyFoods.Find(e => e.name == selected));
+        if (selectedItem != null) foodItems.Add(selectedItem);
+    }
+
+    private float GetTotalProtein(List<FoodItem> foodItems)
+    {
+        float total = 0;
+
+        foreach(FoodItem foodItem in foodItems)
+        {
+            total += foodItem.protein.value;
+        }
+
+        return total;
+    }
+
+    private List<FoodItem> foodItems = new List<FoodItem>();
+}
