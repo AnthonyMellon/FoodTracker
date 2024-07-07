@@ -17,14 +17,14 @@
 <!-- Add food items to the list -->
 <InputSelect @bind-Value:get="selectedFood" @bind-Value:set="SetSelectedFood">
     <option value="" disabled selected>Add an item</option>
-    @foreach (FoodItem foodItem in DebugUtils.DummyFoods)
+    @foreach (FoodItem foodItem in SelectableFoodItems)
     {
         <option value="@foodItem.name">@foodItem</option>
     }
 </InputSelect>
 
 <!-- List each food item added to the list -->
-@foreach (FoodItem foodItem in foodItems)
+@foreach (FoodItem foodItem in selectedFoodItems)
 {  
     <div>
         <label>>@foodItem</label>
@@ -39,25 +39,51 @@
 <!-- Disaply totals -->
 <div>
     <label>Totals</label>
-    <div>Calroies: @foodItems.Sum(i => i.calories)</div>
-    <div>Protein: @foodItems.Sum(i => i.protein.value)@Utils.MacroToUnitAbbv(Macros.Protein)</div>
-    <div>Carbs: @foodItems.Sum(i => i.carbs.value)@Utils.MacroToUnitAbbv(Macros.Carb)</div>
-    <div>Fat: @foodItems.Sum(i => i.fat.value)@Utils.MacroToUnitAbbv(Macros.Fat)</div>
+    <div>Calroies: @selectedFoodItems.Sum(i => i.calories)</div>
+    <div>Protein: @selectedFoodItems.Sum(i => i.protein.value)@Utils.MacroToUnitAbbv(Macros.Protein)</div>
+    <div>Carbs: @selectedFoodItems.Sum(i => i.carbs.value)@Utils.MacroToUnitAbbv(Macros.Carb)</div>
+    <div>Fat: @selectedFoodItems.Sum(i => i.fat.value)@Utils.MacroToUnitAbbv(Macros.Fat)</div>
 </div>
- 
 
 @code
 {
     public string? selectedFood { get; private set; }
+    private List<FoodItem> selectedFoodItems = new List<FoodItem>();
+    private List<FoodItem> SelectableFoodItems = new List<FoodItem>();
 
     private void SetSelectedFood(string? selected)
     {
         if (selected == null) return;
 
         //Find and add the selected food item
-        FoodItem? selectedItem = (DebugUtils.DummyFoods.Find(e => e.name == selected));
-        if (selectedItem != null) foodItems.Add(selectedItem);
+        FoodItem? selectedItem = (SelectableFoodItems.Find(e => e.name == selected));
+        if (selectedItem != null) selectedFoodItems.Add(selectedItem);        
     }
 
-    private List<FoodItem> foodItems = new List<FoodItem>();
+    Task LoadSelectableFoodItems()
+    {
+        SelectableFoodItems.Clear();
+
+        List<MongoFoodItem>? mongoFoodItems = dbManager.GetAllFoodItems();        
+
+        if(mongoFoodItems != null)
+        {
+            foreach (MongoFoodItem foodItem in mongoFoodItems) //Convert all the mongoFoodItems to foodItems
+            {
+                SelectableFoodItems.Add(new FoodItem(
+                    foodItem.Name,
+                    (float)foodItem.Calories,
+                    (float)foodItem.Protein,
+                    (float)foodItem.Carbs,
+                    (float)foodItem.Fat
+            ));}
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSelectableFoodItems();
+    }
 }

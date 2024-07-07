@@ -7,7 +7,11 @@ namespace FoodTracker.Scripts.DataBase
     {
         private string? _URIConnectionString = null;
         private MongoClient? _client;
-        public bool Connected { get; private set; }
+        private bool _connected;
+        public bool Connected => _connected && _client != null;
+
+        //Collections
+        private IMongoCollection<MongoFoodItem>? _foodItemCollection;
 
         public DBManager(string? URIConnectionString)
         {
@@ -18,6 +22,16 @@ namespace FoodTracker.Scripts.DataBase
             }
 
             EstablishConnection();
+            LoadCollections();
+        }
+
+        private void LoadCollections()
+        {
+            if (!Connected) return;
+
+            IMongoDatabase db = _client.GetDatabase("FoodTracker");
+
+            _foodItemCollection = db.GetCollection<MongoFoodItem>("FoodItems");
         }
 
         private bool EstablishConnection()
@@ -37,7 +51,7 @@ namespace FoodTracker.Scripts.DataBase
 
         private void DropConnection()
         {
-            Connected = false;
+            _connected = false;
             _client = null;
         }
 
@@ -50,15 +64,24 @@ namespace FoodTracker.Scripts.DataBase
             {
                 BsonDocument result = _client.GetDatabase("admin").RunCommand<BsonDocument>(new BsonDocument("ping", 1));
 
-                Connected = true;
+                _connected = true;
                 return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                Connected = false;
+                _connected = false;
                 return false;
             }
+        }
+
+        public List<MongoFoodItem>? GetAllFoodItems()
+        {
+            if (!Connected) return null;
+
+            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Empty;
+
+            return _foodItemCollection.Find(filter).ToList();
         }
     }
 }

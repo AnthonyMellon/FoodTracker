@@ -8,13 +8,13 @@
         public Macro carbs { get; private set; }
         public Macro fat { get; private set; }
 
-        public FoodItem(string name, float calories, float protein, float carbs, float fat)
+        public FoodItem(string name, float numCalories, float numProtein, float numCarbs, float numFat)
         {
             this.name = name;
-            this.calories = calories;
-            this.protein = new Macro(Macros.Protein, protein);
-            this.carbs = new Macro(Macros.Carb, carbs);
-            this.fat = new Macro(Macros.Fat, fat);
+            this.calories = numCalories;
+            this.protein = new Macro(Macros.Protein, numProtein);
+            this.carbs = new Macro(Macros.Carb, numCarbs);
+            this.fat = new Macro(Macros.Fat, numFat);
         }
 
         public override string ToString()
