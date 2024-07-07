@@ -1,16 +1,18 @@
 ﻿@page "/FoodTracker"
-@using global::FoodTracker.Scripts
-@using Microsoft.Extensions.Configuration
-@inject IConfiguration Configuration
 @rendermode InteractiveServer
+
+@* Usings *@
+@using global::FoodTracker.Scripts
+@using global::FoodTracker.Scripts.DataBase
+
+@* Injects *@
+@inject DBManager dbManager
 
 <link href="./Styles/FoodTracker.css" rel="stylesheet"/>
 
 <PageTitle>Foood Tracker</PageTitle>
 
 <h3>Welcome to your food tracker</h3>
-
-<button onclick=@ConnectToDB>Connect</button> <!--  Tempy debug button -->
 
 <!-- Add food items to the list -->
 <InputSelect @bind-Value:get="selectedFood" @bind-Value:set="SetSelectedFood">
@@ -55,21 +57,6 @@
         //Find and add the selected food item
         FoodItem? selectedItem = (DebugUtils.DummyFoods.Find(e => e.name == selected));
         if (selectedItem != null) foodItems.Add(selectedItem);
-    }
-
-    private void ConnectToDB()
-    {
-        if (DBTalker.Connected) return;
-
-        string? connectionURI = Configuration["DBConnectionURI"];
-
-        if(connectionURI == null)
-        {
-            Console.WriteLine("Unable to find connection URI");
-            return;
-        }
-        DBTalker.EstablishNewConnection(connectionURI);
-
     }
 
     private List<FoodItem> foodItems = new List<FoodItem>();
