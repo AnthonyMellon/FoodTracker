@@ -1,0 +1,65 @@
+﻿@page "/AddFoodItem"
+@rendermode InteractiveServer
+
+@* Usings *@
+@using Scripts.DataBase
+
+@* Injects *@
+@inject DBManager dbManager
+
+<PageTitle> Create Food Item </PageTitle>
+
+<h3>Create A Food Item</h3>
+
+<form method="post" @onsubmit="Submit" @formname="create-new-foodItem">
+    <AntiforgeryToken />
+    <div>
+        <label>
+            Name:
+            <InputText @bind-Value="foodItem!.Name"></InputText>
+        </label>
+        <label>
+            Calories:
+            <InputNumber @bind-Value="foodItem!.Calories"></InputNumber>
+        </label>
+        <label>
+            Protein:
+            <InputNumber @bind-Value="foodItem!.Protein"></InputNumber>
+        </label>
+        <label>
+            Carbs:
+            <InputNumber @bind-Value="foodItem!.Carbs"></InputNumber>
+        </label>
+        <label>
+            Fat:
+            <InputNumber @bind-Value="foodItem!.Fat"></InputNumber>
+        </label>
+    </div>
+    <div>
+        <button type="submit">Submit</button>
+    </div>
+</form>
+
+<div> @* TODO - a better way of displaying the status *@
+    @insertStatus?.message
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private MongoFoodItem? foodItem { get; set; } = new MongoFoodItem();
+
+    private (bool success, string message)? insertStatus;
+
+    private async void Submit()
+    {
+        if (foodItem == null) return;
+
+        foodItem.Id = new();
+        insertStatus = dbManager.TryInsertFoodItem(foodItem);
+
+        //TODO - a better way of displaying the status
+        await Task.Delay(2000);        
+        insertStatus = null;
+        StateHasChanged();
+    }
+}
