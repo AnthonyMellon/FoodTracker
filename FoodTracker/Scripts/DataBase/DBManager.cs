@@ -83,5 +83,23 @@ namespace FoodTracker.Scripts.DataBase
 
             return _foodItemCollection.Find(filter).ToList();
         }
+
+        public (bool success, string message) TryInsertFoodItem(MongoFoodItem foodItem)
+        {
+            if (!Connected) return (false, "not connected to database");
+            if (foodItem == null) return (false, "foodItem is null");
+
+            //Do input validation here
+
+            try
+            {
+                _foodItemCollection.InsertOne(foodItem);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.ToString());
+            }
+            return (true, $"Successfully inserted {foodItem.Name}");
+        }
     }
 }
