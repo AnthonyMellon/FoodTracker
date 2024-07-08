@@ -40,26 +40,34 @@
     </div>
 </form>
 
-<div> @* TODO - a better way of displaying the status *@
-    @insertStatus?.message
+<div>
+    @if(insertStatus?.messages != null)
+    {
+        foreach (string message in insertStatus?.messages)
+        {
+            <div>@message</div>
+        }
+        <button onclick="@ClearInsertStatus">Got it!</button>
+    }
+
 </div>
 
 @code {
     [SupplyParameterFromForm]
     private MongoFoodItem? foodItem { get; set; } = new MongoFoodItem();
 
-    private (bool success, string message)? insertStatus;
+    private (bool success, List<string> messages)? insertStatus;
 
-    private async void Submit()
+    private void Submit()
     {
         if (foodItem == null) return;
 
         foodItem.Id = new();
         insertStatus = dbManager.TryInsertFoodItem(foodItem);
+    }
 
-        //TODO - a better way of displaying the status
-        await Task.Delay(2000);        
+    private void ClearInsertStatus()
+    {
         insertStatus = null;
-        StateHasChanged();
     }
 }

@@ -85,22 +85,46 @@ namespace FoodTracker.Scripts.DataBase
             return _foodItemCollection.Find(filter).ToList();
         }
 
-        public (bool success, string message) TryInsertFoodItem(MongoFoodItem foodItem)
+        public (bool success, List<string> messages) TryInsertFoodItem(MongoFoodItem foodItem)
         {
-            if (!Connected) return (false, "not connected to database");
-            if (foodItem == null) return (false, "foodItem is null");
+            List<string> returnMessages = new List<string>();
 
-            //Do input validation here
+            if (!Connected) //Check if connected to DB
+            {
+                returnMessages.Add("not connected to database");
+                return (false, returnMessages);
+            }
+            if (foodItem == null) //Make sure we were actually given a food item to begin with
+            {
+                returnMessages.Add(ErrorUtils.Messages.IsNull("foodItem"));
+                return (false, returnMessages);
+            }
 
+            //Input Validation
+            if (foodItem.Name == null) returnMessages.Add(ErrorUtils.Messages.IsNull("Name"));
+            else if (_foodItemCollection.AsQueryable().Where(i => i.Name == foodItem.Name).FirstOrDefault() != null) returnMessages.Add(ErrorUtils.Messages.AlreadyExists("Name", foodItem.Name)); //Make sure there are no duplicate named items
+            if (foodItem.Calories < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Calories"));
+            if (foodItem.Protein < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Protein"));
+            if (foodItem.Carbs < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Carbs"));
+            if (foodItem.Fat < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Fat"));
+
+            //If there's some return messages, validation has failed. Return all the reasons why
+            if (returnMessages.Count != 0) return (false, returnMessages);
+
+            //Input validation passed, try insert to db and see if it accepts the food item
             try
             {
-                _foodItemCollection.InsertOne(foodItem);
+                _foodItemCollection?.InsertOne(foodItem);
             }
-            catch (Exception ex)
+            catch (Exception ex) //Womp womp
             {
-                return (false, ex.ToString());
+                returnMessages.Add(ex.ToString());
+                return (false, returnMessages);
             }
-            return (true, $"Successfully inserted {foodItem.Name}");
+
+            //Success!
+            returnMessages.Add($"Successfully created {foodItem.Name}");
+            return (true, returnMessages);
         }
     }
 }
