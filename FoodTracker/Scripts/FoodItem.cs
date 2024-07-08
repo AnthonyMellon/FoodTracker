@@ -1,4 +1,6 @@
-﻿namespace FoodTracker.Scripts
+﻿using FoodTracker.Scripts.Utils;
+
+namespace FoodTracker.Scripts
 {
     public class FoodItem
     {

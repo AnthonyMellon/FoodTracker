@@ -4,6 +4,7 @@
 @* Usings *@
 @using global::FoodTracker.Scripts
 @using global::FoodTracker.Scripts.DataBase
+@using global::FoodTracker.Scripts.Utils
 
 @* Injects *@
 @inject DBManager dbManager
@@ -29,9 +30,9 @@
     <div>
         <label>>@foodItem</label>
         <div>Calories: @foodItem.calories</div>
-        <div>Protein: @foodItem.protein.value@Utils.MacroToUnitAbbv(Macros.Protein)</div>
-        <div>Carbs: @foodItem.carbs.value@Utils.MacroToUnitAbbv(Macros.Carb)</div>
-        <div>Fat: @foodItem.fat.value@Utils.MacroToUnitAbbv(Macros.Fat)</div>
+        <div>Protein: @foodItem.protein.value@FoodUtils.MacroToUnitAbbv(Macros.Protein)</div>
+        <div>Carbs: @foodItem.carbs.value@FoodUtils.MacroToUnitAbbv(Macros.Carb)</div>
+        <div>Fat: @foodItem.fat.value@FoodUtils.MacroToUnitAbbv(Macros.Fat)</div>
     </div>
     <hr />
 }
@@ -40,9 +41,9 @@
 <div>
     <label>Totals</label>
     <div>Calroies: @selectedFoodItems.Sum(i => i.calories)</div>
-    <div>Protein: @selectedFoodItems.Sum(i => i.protein.value)@Utils.MacroToUnitAbbv(Macros.Protein)</div>
-    <div>Carbs: @selectedFoodItems.Sum(i => i.carbs.value)@Utils.MacroToUnitAbbv(Macros.Carb)</div>
-    <div>Fat: @selectedFoodItems.Sum(i => i.fat.value)@Utils.MacroToUnitAbbv(Macros.Fat)</div>
+    <div>Protein: @selectedFoodItems.Sum(i => i.protein.value)@FoodUtils.MacroToUnitAbbv(Macros.Protein)</div>
+    <div>Carbs: @selectedFoodItems.Sum(i => i.carbs.value)@FoodUtils.MacroToUnitAbbv(Macros.Carb)</div>
+    <div>Fat: @selectedFoodItems.Sum(i => i.fat.value)@FoodUtils.MacroToUnitAbbv(Macros.Fat)</div>
 </div>
 
 @code

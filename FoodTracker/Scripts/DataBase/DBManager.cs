@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using FoodTracker.Scripts.Utils;
 
 namespace FoodTracker.Scripts.DataBase
 {

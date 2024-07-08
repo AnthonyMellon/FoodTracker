@@ -1,4 +1,4 @@
-﻿namespace FoodTracker.Scripts
+﻿namespace FoodTracker.Scripts.Utils
 {
     public static class DebugUtils
     {

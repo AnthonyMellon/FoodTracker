@@ -1,4 +1,4 @@
-﻿namespace FoodTracker.Scripts
+﻿namespace FoodTracker.Scripts.Utils
 {
     public enum Unit
     {
@@ -25,7 +25,7 @@
         }
     }
 
-    public static class Utils
+    public static class FoodUtils
     {
         public static Dictionary<Unit, string> unitToAbbreviation = new Dictionary<Unit, string>()
         {
@@ -42,7 +42,7 @@
 
         public static string MacroToUnitAbbv(Macros macro)
         {
-            return (unitToAbbreviation[macrosToUnit[macro]]);
+            return unitToAbbreviation[macrosToUnit[macro]];
         }
     }
 }
