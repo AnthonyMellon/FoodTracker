@@ -127,7 +127,7 @@ namespace FoodTracker.Scripts.DataBase
             ObjectId id = newData.Id;
 
             FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Eq(foodItem => foodItem.Id, id);
-            var update = Builders<MongoFoodItem>.Update
+            UpdateDefinition<MongoFoodItem> update = Builders<MongoFoodItem>.Update
                 .Set(foodItem => foodItem.Name, newData.Name)
                 .Set(fooditem => fooditem.Calories, newData.Calories)
                 .Set(foodItem => foodItem.Protein, newData.Protein)
