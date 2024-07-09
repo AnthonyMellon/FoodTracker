@@ -26,6 +26,7 @@ namespace FoodTracker.Scripts.DataBase
             LoadCollections();
         }
 
+        #region Setup Stuff
         private void LoadCollections()
         {
             if (!Connected) return;
@@ -34,7 +35,9 @@ namespace FoodTracker.Scripts.DataBase
 
             _foodItemCollection = db.GetCollection<MongoFoodItem>("FoodItems");
         }
+        #endregion
 
+        #region Connection Stuff
         private bool EstablishConnection()
         {
             DropConnection();
@@ -75,7 +78,9 @@ namespace FoodTracker.Scripts.DataBase
                 return false;
             }
         }
+        #endregion
 
+        #region FoodItemStuff
         public List<MongoFoodItem>? GetAllFoodItems()
         {
             if (!Connected) return null;
@@ -179,5 +184,6 @@ namespace FoodTracker.Scripts.DataBase
 
             return returnMessages;
         }
+        #endregion
     }
 }
