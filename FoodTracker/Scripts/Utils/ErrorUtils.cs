@@ -48,6 +48,11 @@
             {
                 return $"{param} with value {value} already exists";
             }
+
+            public static string NotConnected()
+            {
+                return "Not connected to database";
+            }
         }
 #endregion
     }

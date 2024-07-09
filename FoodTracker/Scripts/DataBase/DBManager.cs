@@ -90,13 +90,38 @@ namespace FoodTracker.Scripts.DataBase
             return _foodItemCollection.Find(filter).ToList();
         }
 
+        public (bool success, List<string> messages) DeleteFoodItem(ObjectId id)
+        { 
+            List<string> returnMessages = new List<string>();
+
+            //Make sure we're connected before continuing
+            if(!Connected)
+            {
+                returnMessages.Add(ErrorUtils.Messages.NotConnected());
+                return (false, returnMessages);
+            }
+
+            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Eq(foodItem => foodItem.Id, id);            
+            try //Try delete the foood item
+            {
+                _foodItemCollection?.DeleteOne(filter);
+                returnMessages.Add($"Deleted {id}");
+                return (true, returnMessages);
+            }
+            catch(Exception ex) //Failed to delete the food item
+            {
+                returnMessages.Add(ex.ToString());
+                return (false, returnMessages);
+            }
+        }
+
         public (bool success, List<string> messages) TryInsertFoodItem(MongoFoodItem foodItem)
         {
             List<string> returnMessages = new List<string>();
 
             if (!Connected) //Check if connected to DB
             {
-                returnMessages.Add("not connected to database");
+                returnMessages.Add(ErrorUtils.Messages.NotConnected());
                 return (false, returnMessages);
             }
 
@@ -124,6 +149,8 @@ namespace FoodTracker.Scripts.DataBase
 
         public (bool success, List<string> messages) TryUpdateFoodItem(MongoFoodItem newData)
         {
+            Console.WriteLine("Attempting to update food item");
+
             //Make sure the new data is valid
             List<string> returnMessages = ValidateFoodItem(newData);
             if (returnMessages.Count != 0) return (false, returnMessages);
@@ -137,7 +164,7 @@ namespace FoodTracker.Scripts.DataBase
                 .Set(fooditem => fooditem.Calories, newData.Calories)
                 .Set(foodItem => foodItem.Protein, newData.Protein)
                 .Set(foodItem => foodItem.Carbs, newData.Carbs)
-                .Set(foodItem => foodItem.Fat, newData.Fat);                
+                .Set(foodItem => foodItem.Fat, newData.Fat);
 
             try
             {
@@ -145,12 +172,12 @@ namespace FoodTracker.Scripts.DataBase
                 returnMessages.Add($"Successfully updated {newData.Name}");
                 return (true, returnMessages);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 returnMessages.Add(ex.ToString());
                 return (false, returnMessages);
             }
-            
+
         }
 
         /// <summary>
