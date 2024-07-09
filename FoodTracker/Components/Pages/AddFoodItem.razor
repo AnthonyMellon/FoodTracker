@@ -9,41 +9,72 @@
 
 <PageTitle> Create Food Item </PageTitle>
 
-<h3>Create A Food Item</h3>
+<h3>Modify Food Items</h3>
 
-<form method="post" @onsubmit="Submit" @formname="create-new-foodItem">
+@* Add a food item *@
+<form method="post" @onsubmit="SubmitFoodItem" @formname="create-new-foodItem">
     <AntiforgeryToken />
     <div>
         <label>
             Name:
-            <InputText @bind-Value="foodItem!.Name"></InputText>
+            <InputText @bind-Value="_foodItemToAdd!.Name"></InputText>
         </label>
         <label>
             Calories:
-            <InputNumber @bind-Value="foodItem!.Calories"></InputNumber>
+            <InputNumber @bind-Value="_foodItemToAdd!.Calories"></InputNumber>
         </label>
         <label>
             Protein:
-            <InputNumber @bind-Value="foodItem!.Protein"></InputNumber>
+            <InputNumber @bind-Value="_foodItemToAdd!.Protein"></InputNumber>
         </label>
         <label>
             Carbs:
-            <InputNumber @bind-Value="foodItem!.Carbs"></InputNumber>
+            <InputNumber @bind-Value="_foodItemToAdd!.Carbs"></InputNumber>
         </label>
         <label>
             Fat:
-            <InputNumber @bind-Value="foodItem!.Fat"></InputNumber>
+            <InputNumber @bind-Value="_foodItemToAdd!.Fat"></InputNumber>
         </label>
     </div>
     <div>
-        <button type="submit">Submit</button>
+        <button type="submit">Add</button>
     </div>
 </form>
 
-<div>
-    @if(insertStatus?.messages != null)
+@* Edit food items *@
+<button onclick=@(() => {_allowDeletes = !_allowDeletes;})>Allow deletes: @_allowDeletes</button>
+
+@if(_foodItems != null)
+{
+    foreach (MongoFoodItem foodItem in _foodItems)
     {
-        foreach (string message in insertStatus?.messages)
+        string formName = $"edit-food-{foodItem.Id}";
+        <form method="post" @onsubmit=@(() => {EditFoodItem(foodItem);}) @formname=@formName>
+
+            @* Edit Item *@
+            <InputText @bind-Value="foodItem.Name"></InputText>
+            <InputNumber @bind-Value="foodItem.Calories"></InputNumber>
+            <InputNumber @bind-Value="foodItem.Protein"></InputNumber>
+            <InputNumber @bind-Value="foodItem.Carbs"></InputNumber>
+            <InputNumber @bind-Value="foodItem.Fat"></InputNumber>
+            
+            <button type="submit">Save Changes</button>
+
+            @* Delete Item *@
+            @if(_allowDeletes)
+            {
+                <button @onclick=@(() => {DeleteFoodItem(foodItem.Id);})>Delete Food Item</button>
+            }
+
+        </form>
+    }
+}
+
+@* Display status of last action *@
+<div>
+    @if(_insertStatus?.messages != null)
+    {
+        foreach (string message in _insertStatus?.messages)
         {
             <div>@message</div>
         }
@@ -54,20 +85,52 @@
 
 @code {
     [SupplyParameterFromForm]
-    private MongoFoodItem? foodItem { get; set; } = new MongoFoodItem();
+    private MongoFoodItem? _foodItemToAdd { get; set; } = new MongoFoodItem();
+    private List<MongoFoodItem>? _foodItems = new List<MongoFoodItem>();
 
-    private (bool success, List<string> messages)? insertStatus;
+    private (bool success, List<string> messages)? _insertStatus;
 
-    private void Submit()
+    private bool _allowDeletes = false;
+
+    private async void SubmitFoodItem()
     {
-        if (foodItem == null) return;
+        if (_foodItemToAdd == null) return;
 
-        foodItem.Id = new();
-        insertStatus = dbManager.TryInsertFoodItem(foodItem);
+        _foodItemToAdd.Id = new();
+        _insertStatus = dbManager.TryInsertFoodItem(_foodItemToAdd);
+
+        await LoadFoodItems();
+    }
+
+    private void EditFoodItem(MongoFoodItem foodItem)
+    {
+        _insertStatus = dbManager.TryUpdateFoodItem(foodItem);
+    }
+
+    private void DeleteFoodItem(MongoDB.Bson.ObjectId id) //Implement me
+    {
+        Console.WriteLine($"(Not implemented) Deleting {id}");
     }
 
     private void ClearInsertStatus()
     {
-        insertStatus = null;
+        _insertStatus = null;
+    }
+
+    Task LoadFoodItemsTask()
+    {
+        _foodItems?.Clear();
+        _foodItems = dbManager.GetAllFoodItems();
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFoodItems();
+    }
+
+    private async Task LoadFoodItems()
+    {
+        await LoadFoodItemsTask();
     }
 }

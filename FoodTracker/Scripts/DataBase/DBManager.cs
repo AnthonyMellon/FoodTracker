@@ -94,19 +94,9 @@ namespace FoodTracker.Scripts.DataBase
                 returnMessages.Add("not connected to database");
                 return (false, returnMessages);
             }
-            if (foodItem == null) //Make sure we were actually given a food item to begin with
-            {
-                returnMessages.Add(ErrorUtils.Messages.IsNull("foodItem"));
-                return (false, returnMessages);
-            }
 
             //Input Validation
-            if (foodItem.Name == null) returnMessages.Add(ErrorUtils.Messages.IsNull("Name"));
-            else if (_foodItemCollection.AsQueryable().Where(i => i.Name == foodItem.Name).FirstOrDefault() != null) returnMessages.Add(ErrorUtils.Messages.AlreadyExists("Name", foodItem.Name)); //Make sure there are no duplicate named items
-            if (foodItem.Calories < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Calories"));
-            if (foodItem.Protein < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Protein"));
-            if (foodItem.Carbs < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Carbs"));
-            if (foodItem.Fat < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Fat"));
+            returnMessages = ValidateFoodItem(foodItem);
 
             //If there's some return messages, validation has failed. Return all the reasons why
             if (returnMessages.Count != 0) return (false, returnMessages);
@@ -125,6 +115,69 @@ namespace FoodTracker.Scripts.DataBase
             //Success!
             returnMessages.Add($"Successfully created {foodItem.Name}");
             return (true, returnMessages);
+        }
+
+        public (bool success, List<string> messages) TryUpdateFoodItem(MongoFoodItem newData)
+        {
+            //Make sure the new data is valid
+            List<string> returnMessages = ValidateFoodItem(newData);
+            if (returnMessages.Count != 0) return (false, returnMessages);
+
+            //New data is valid
+            ObjectId id = newData.Id;
+
+            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Eq(foodItem => foodItem.Id, id);
+            var update = Builders<MongoFoodItem>.Update
+                .Set(foodItem => foodItem.Name, newData.Name)
+                .Set(fooditem => fooditem.Calories, newData.Calories)
+                .Set(foodItem => foodItem.Protein, newData.Protein)
+                .Set(foodItem => foodItem.Carbs, newData.Carbs)
+                .Set(foodItem => foodItem.Fat, newData.Fat);                
+
+            try
+            {
+                _foodItemCollection?.UpdateOne(filter, update);
+                returnMessages.Add($"Successfully updated {newData.Name}");
+                return (true, returnMessages);
+            }
+            catch(Exception ex)
+            {
+                returnMessages.Add(ex.ToString());
+                return (false, returnMessages);
+            }
+            
+        }
+
+        /// <summary>
+        /// Ensures a food item's values are all ok
+        /// </summary>
+        /// <param name="foodItem">The food item to check</param>
+        /// <returns>A list of messages describing any issues found with <paramref name="foodItem"/></returns>
+        private List<string> ValidateFoodItem(MongoFoodItem foodItem)
+        {
+            List<string> returnMessages = new List<string>();
+
+            if (foodItem == null) //Make sure there's an acutal food item being passed in. No point in continuing if there isn't
+            {
+                returnMessages.Add(ErrorUtils.Messages.IsNull("food item"));
+                return returnMessages;
+            }
+
+            if (foodItem.Name == null) returnMessages.Add(ErrorUtils.Messages.IsNull("Name"));
+            if (foodItem.Name == "") returnMessages.Add(ErrorUtils.Messages.IsEmpty("Name"));
+            if (foodItem.Calories < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Calories"));
+            if (foodItem.Protein < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Protein"));
+            if (foodItem.Carbs < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Carbs"));
+            if (foodItem.Fat < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Fat"));
+            if (_foodItemCollection.AsQueryable().Where( //Check to make sure there are no other food items with the same name
+                    i => i.Id != foodItem.Id && //No need to check against itself (relevant when editing a food item)
+                    i.Name == foodItem.Name
+                ).FirstOrDefault() != null)
+            {
+                returnMessages.Add(ErrorUtils.Messages.AlreadyExists("Name", foodItem.Name));
+            }
+
+            return returnMessages;
         }
     }
 }

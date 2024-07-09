@@ -19,6 +19,16 @@
             }
 
             /// <summary>
+            /// When <paramref name="param"/> is empty and you dont want it to be
+            /// </summary>
+            /// <param name="param">The param that should not be empty</param>
+            /// <returns></returns>
+            public static string IsEmpty(string param)
+            {
+                return $"{param} cannot be empty";
+            }
+
+            /// <summary>
             /// When <paramref name="param"/> is negative and you dont want it to be
             /// </summary>
             /// <param name="param">The name of the param that should be positive</param>
