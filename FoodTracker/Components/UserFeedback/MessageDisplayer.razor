@@ -1,0 +1,18 @@
+﻿@if(messages != null)
+{    
+    foreach (string message in messages)
+    {
+        <div>@message</div>
+    }
+
+    if(messages?.Count > 0)
+    {
+        <button @onclick="ClearStatus">Clear</button>        
+    }
+}
+
+
+@code {
+    [Parameter] public List<string> messages { get; set; } = new List<string>();
+    [Parameter] public Action ClearStatus { get; set; } = () => { }; 
+}
