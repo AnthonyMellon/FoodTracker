@@ -1,0 +1,46 @@
+﻿@* Usings *@
+@using System.Text
+@using Scripts.DataBase
+
+@* Injects *@
+@inject DBManager dbManager
+
+@if(foodItem != null)
+{
+    StringBuilder sb = new StringBuilder("edit-food-");
+    sb.Append(foodItem.Id);
+    string formName = sb.ToString();
+
+    <form method="post" @onsubmit=Edit @formname=@formName>
+        <AntiforgeryToken />
+        
+        <InputText @bind-Value="foodItem.Name"></InputText>
+        <InputNumber @bind-Value="foodItem.Calories"></InputNumber>
+        <InputNumber @bind-Value="foodItem.Protein"></InputNumber>
+        <InputNumber @bind-Value="foodItem.Carbs"></InputNumber>
+        <InputNumber @bind-Value="foodItem.Fat"></InputNumber>
+
+        <button type="submit">Save Changes</button>  
+               
+    </form>
+    <FoodTracker.Components.UserFeedback.MessageDisplayer messages="_lastEditStatus.messages" ClearStatus="ClearStatus"/>
+}
+
+
+
+@code {
+    [Parameter] public MongoFoodItem? foodItem { get; set; }
+    private (bool success, List<string> messages) _lastEditStatus = (false, new List<string>());
+
+    private void Edit()
+    {
+        if (foodItem == null) return;
+
+        _lastEditStatus = dbManager.TryUpdateFoodItem(foodItem);
+    }
+
+    private void ClearStatus()
+    {
+        _lastEditStatus = (false, new List<string>());
+    }
+}

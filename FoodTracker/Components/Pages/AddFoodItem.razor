@@ -3,6 +3,7 @@
 
 @* Usings *@
 @using Scripts.DataBase
+@using Components.FoodStuff
 
 @* Injects *@
 @inject DBManager dbManager
@@ -45,44 +46,17 @@
 <button onclick=@(() => {_allowDeletes = !_allowDeletes;})>Allow deletes: @_allowDeletes</button>
 
 @if(_foodItems != null)
-{
+{        
     foreach (MongoFoodItem foodItem in _foodItems)
-    {
-        string formName = $"edit-food-{foodItem.Id}";
-        <form method="post" @onsubmit=@(() => {}) @formname=@formName>
-            <AntiforgeryToken />
-
-            @* Edit Item *@
-            <InputText @bind-Value="foodItem.Name"></InputText>
-            <InputNumber @bind-Value="foodItem.Calories"></InputNumber>
-            <InputNumber @bind-Value="foodItem.Protein"></InputNumber>
-            <InputNumber @bind-Value="foodItem.Carbs"></InputNumber>
-            <InputNumber @bind-Value="foodItem.Fat"></InputNumber>
-            
-            <button @onclick=@(() => {EditFoodItem(foodItem);})>Save Changes</button>
-
-            @* Delete Item *@
-            @if(_allowDeletes)
-            {
-                <button @onclick=@(() => {DeleteFoodItem(foodItem.Id);})>Delete Food Item</button>
-            }
-
-        </form>
+    {        
+        <FoodTracker.Components.FoodStuff.FoodItemEditor foodItem="foodItem"/> @* TODO: Figure out why the using tag isn't working, I dont like having the full name here*@
+        if(_allowDeletes)
+        {
+            <FoodTracker.Components.FoodStuff.FoodItemDeletor foodItemID="foodItem.Id" ReloadFoodItems="LoadFoodItemsSync"/>            
+        }
+        
     }
 }
-
-@* Display status of last action *@
-<div>
-    @if(_insertStatus?.messages != null)
-    {
-        foreach (string message in _insertStatus?.messages)
-        {
-            <div>@message</div>
-        }
-        <button onclick="@ClearInsertStatus">Got it!</button>
-    }
-
-</div>
 
 @code {
     [SupplyParameterFromForm]
@@ -99,18 +73,6 @@
 
         _foodItemToAdd.Id = new();
         _insertStatus = dbManager.TryInsertFoodItem(_foodItemToAdd);
-
-        await LoadFoodItems();
-    }
-
-    private void EditFoodItem(MongoFoodItem foodItem)
-    {
-        _insertStatus = dbManager.TryUpdateFoodItem(foodItem);
-    }
-
-    private async void DeleteFoodItem(MongoDB.Bson.ObjectId id) //Implement me
-    {
-        _insertStatus = dbManager.DeleteFoodItem(id);
 
         await LoadFoodItems();
     }
@@ -135,5 +97,12 @@
     private async Task LoadFoodItems()
     {
         await LoadFoodItemsTask();
+    }
+
+    private void LoadFoodItemsSync()
+    {
+        _foodItems?.Clear();
+        _foodItems = dbManager.GetAllFoodItems();
+        StateHasChanged();
     }
 }

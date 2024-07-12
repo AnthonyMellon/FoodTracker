@@ -31,9 +31,9 @@ namespace FoodTracker.Scripts.DataBase
         {
             if (!Connected) return;
 
-            IMongoDatabase db = _client.GetDatabase("FoodTracker");
+            IMongoDatabase? db = _client?.GetDatabase("FoodTracker");
 
-            _foodItemCollection = db.GetCollection<MongoFoodItem>("FoodItems");
+            _foodItemCollection = db?.GetCollection<MongoFoodItem>("FoodItems");
         }
         #endregion
 
