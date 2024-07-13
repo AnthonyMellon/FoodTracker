@@ -15,8 +15,10 @@
 @* Add a food item *@
 <FoodTracker.Components.FoodStuff.FoodItemAdder OnAddComplete="LoadFoodItemsSync"/>
 
+@* Toggle deletes *@
+<button onclick=@ToggleAllowDeletes>Allow deletes: @_allowDeletes</button>
+
 @* Edit food items *@
-<button onclick=@(() => {_allowDeletes = !_allowDeletes;})>Allow deletes: @_allowDeletes</button>
 
 @if(_foodItems != null)
 {        
@@ -25,7 +27,7 @@
         <FoodTracker.Components.FoodStuff.FoodItemEditor foodItem="foodItem"/> @* TODO: Figure out why the using tag isn't working, I dont like having the full name here*@
         if(_allowDeletes)
         {
-            <FoodTracker.Components.FoodStuff.FoodItemDeletor foodItemID="foodItem.Id" ReloadFoodItems="LoadFoodItemsSync"/>            
+            <FoodTracker.Components.FoodStuff.FoodItemDeletor foodItemID="foodItem.Id" OnDeleteComplete="LoadFoodItemsSync"/>            
         }
         
     }
@@ -36,23 +38,11 @@
     private MongoFoodItem? _foodItemToAdd { get; set; } = new MongoFoodItem();
     private List<MongoFoodItem>? _foodItems = new List<MongoFoodItem>();
 
-    private (bool success, List<string> messages)? _insertStatus;
-
     private bool _allowDeletes = false;
 
-    private async void SubmitFoodItem()
+    private void ToggleAllowDeletes()
     {
-        if (_foodItemToAdd == null) return;
-
-        _foodItemToAdd.Id = new();
-        _insertStatus = dbManager.TryInsertFoodItem(_foodItemToAdd);
-
-        await LoadFoodItems();
-    }
-
-    private void ClearInsertStatus()
-    {
-        _insertStatus = null;
+        _allowDeletes = !_allowDeletes;
     }
 
     Task LoadFoodItemsTask()

@@ -27,6 +27,10 @@ namespace FoodTracker.Scripts.DataBase
         }
 
         #region Setup Stuff
+
+        /// <summary>
+        /// Loads collections to be used in the app
+        /// </summary>
         private void LoadCollections()
         {
             if (!Connected) return;
@@ -38,6 +42,10 @@ namespace FoodTracker.Scripts.DataBase
         #endregion
 
         #region Connection Stuff
+        /// <summary>
+        /// Sets up connection to DB using _URIConnectionString
+        /// </summary>
+        /// <returns>returns true if connection tests successful, false if not</returns>
         private bool EstablishConnection()
         {
             DropConnection();
@@ -53,12 +61,19 @@ namespace FoodTracker.Scripts.DataBase
             return TestConnection();
         }
 
+        /// <summary>
+        /// Remove the current connection to the database
+        /// </summary>
         private void DropConnection()
         {
             _connected = false;
             _client = null;
         }
 
+        /// <summary>
+        /// Ping the database to ensure it's connected
+        /// </summary>
+        /// <returns>true if connected, false if not</returns>
         private bool TestConnection()
         {
             if (_client == null) return false;
@@ -81,6 +96,11 @@ namespace FoodTracker.Scripts.DataBase
         #endregion
 
         #region FoodItemStuff
+
+        /// <summary>
+        /// Get a list of all food items in the food item collection
+        /// </summary>
+        /// <returns>List of all food items in the database</returns>
         public List<MongoFoodItem>? GetAllFoodItems()
         {
             if (!Connected) return null;
@@ -90,6 +110,11 @@ namespace FoodTracker.Scripts.DataBase
             return _foodItemCollection.Find(filter).ToList();
         }
 
+        /// <summary>
+        /// Attempt to delete a food item with <paramref name="id"/> from the food item collection
+        /// </summary>
+        /// <param name="id">The id of the food item to be deleted</param>
+        /// <returns>true / false depending on success along with a list of messages detailing what happened</returns>
         public (bool success, List<string> messages) TryDeleteFoodItem(ObjectId id)
         { 
             List<string> returnMessages = new List<string>();
@@ -115,6 +140,11 @@ namespace FoodTracker.Scripts.DataBase
             }
         }
 
+        /// <summary>
+        /// Attempts to insert <paramref name="foodItem"/> into the food item collection
+        /// </summary>
+        /// <param name="foodItem">The food item to be inserted</param>
+        /// <returns>true / false depending on success along with a list of messages detailing what happened</returns>
         public (bool success, List<string> messages) TryInsertFoodItem(MongoFoodItem foodItem)
         {
             List<string> returnMessages = new List<string>();
@@ -147,18 +177,20 @@ namespace FoodTracker.Scripts.DataBase
             return (true, returnMessages);
         }
 
+        /// <summary>
+        /// Attempts to update the food item in food items collection with matching id to <paramref name="newData"/> to match <paramref name="newData"/>
+        /// 
+        /// </summary>
+        /// <param name="newData">The food items new data</param>
+        /// <returns></returns>
         public (bool success, List<string> messages) TryUpdateFoodItem(MongoFoodItem newData)
         {
-            Console.WriteLine("Attempting to update food item");
-
             //Make sure the new data is valid
             List<string> returnMessages = ValidateFoodItem(newData);
             if (returnMessages.Count != 0) return (false, returnMessages);
 
             //New data is valid
-            ObjectId id = newData.Id;
-
-            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Eq(foodItem => foodItem.Id, id);
+            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Eq(foodItem => foodItem.Id, newData.Id);
             UpdateDefinition<MongoFoodItem> update = Builders<MongoFoodItem>.Update
                 .Set(foodItem => foodItem.Name, newData.Name)
                 .Set(fooditem => fooditem.Calories, newData.Calories)
@@ -166,13 +198,13 @@ namespace FoodTracker.Scripts.DataBase
                 .Set(foodItem => foodItem.Carbs, newData.Carbs)
                 .Set(foodItem => foodItem.Fat, newData.Fat);
 
-            try
+            try //Attempt to update food item
             {
                 _foodItemCollection?.UpdateOne(filter, update);
                 returnMessages.Add($"Successfully updated {newData.Name}");
                 return (true, returnMessages);
             }
-            catch (Exception ex)
+            catch (Exception ex) //Failed :(
             {
                 returnMessages.Add(ex.ToString());
                 return (false, returnMessages);
