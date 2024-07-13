@@ -29,13 +29,11 @@
 
 
 @code {
-    [Parameter] public MongoFoodItem? foodItem { get; set; }
+    [Parameter] public MongoFoodItem foodItem { get; set; } = new MongoFoodItem();
     private (bool success, List<string> messages) _lastEditStatus = (false, new List<string>());
 
     private void Edit()
     {
-        if (foodItem == null) return;
-
         _lastEditStatus = dbManager.TryUpdateFoodItem(foodItem);
     }
 

@@ -16,7 +16,7 @@
 
     private void Delete()
     {
-        _lastDeleteStatus = dbManager.DeleteFoodItem(foodItemID);
+        _lastDeleteStatus = dbManager.TryDeleteFoodItem(foodItemID);
         ReloadFoodItems();
     }
 

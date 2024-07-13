@@ -90,7 +90,7 @@ namespace FoodTracker.Scripts.DataBase
             return _foodItemCollection.Find(filter).ToList();
         }
 
-        public (bool success, List<string> messages) DeleteFoodItem(ObjectId id)
+        public (bool success, List<string> messages) TryDeleteFoodItem(ObjectId id)
         { 
             List<string> returnMessages = new List<string>();
 
