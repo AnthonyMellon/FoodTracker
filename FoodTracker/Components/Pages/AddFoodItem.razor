@@ -13,34 +13,7 @@
 <h3>Modify Food Items</h3>
 
 @* Add a food item *@
-<form method="post" @onsubmit="SubmitFoodItem" @formname="create-new-foodItem">
-    <AntiforgeryToken />
-    <div>
-        <label>
-            Name:
-            <InputText @bind-Value="_foodItemToAdd!.Name"></InputText>
-        </label>
-        <label>
-            Calories:
-            <InputNumber @bind-Value="_foodItemToAdd!.Calories"></InputNumber>
-        </label>
-        <label>
-            Protein:
-            <InputNumber @bind-Value="_foodItemToAdd!.Protein"></InputNumber>
-        </label>
-        <label>
-            Carbs:
-            <InputNumber @bind-Value="_foodItemToAdd!.Carbs"></InputNumber>
-        </label>
-        <label>
-            Fat:
-            <InputNumber @bind-Value="_foodItemToAdd!.Fat"></InputNumber>
-        </label>
-    </div>
-    <div>
-        <button type="submit">Add</button>
-    </div>
-</form>
+<FoodTracker.Components.FoodStuff.FoodItemAdder OnAddComplete="LoadFoodItemsSync"/>
 
 @* Edit food items *@
 <button onclick=@(() => {_allowDeletes = !_allowDeletes;})>Allow deletes: @_allowDeletes</button>

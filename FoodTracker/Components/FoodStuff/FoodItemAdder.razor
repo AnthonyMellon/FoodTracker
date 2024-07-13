@@ -1,0 +1,59 @@
+﻿@* Usings *@
+@using Scripts.DataBase;
+
+@* Injects *@
+@inject DBManager dbManager
+
+
+<form method="post" @onsubmit="Add" @formname="Add-New-FoodItem">
+    <AntiforgeryToken />
+    <div>
+        <label>
+            Name:
+            <InputText @bind-Value="_foodItemToAdd.Name"></InputText>
+        </label>
+        <label>
+            Calories:
+            <InputNumber @bind-Value="_foodItemToAdd!.Calories"></InputNumber>
+        </label>
+        <label>
+            Protein:
+            <InputNumber @bind-Value="_foodItemToAdd!.Protein"></InputNumber>
+        </label>
+        <label>
+            Carbs:
+            <InputNumber @bind-Value="_foodItemToAdd!.Carbs"></InputNumber>
+        </label>
+        <label>
+            Fat:
+            <InputNumber @bind-Value="_foodItemToAdd!.Fat"></InputNumber>
+        </label>
+    </div>
+    <div>
+        <button type="submit">Add</button>
+    </div>
+</form>
+
+<div>
+    <FoodTracker.Components.UserFeedback.MessageDisplayer messages="_lastAddStatus.messages" ClearStatus="ClearStatus" />
+</div>
+
+@code {
+    [Parameter] public Action OnAddComplete { get; set; } = () => { };
+
+    private (bool success, List<string> messages) _lastAddStatus = (false, new List<string>());
+    private MongoFoodItem _foodItemToAdd { get; set; } = new MongoFoodItem();
+
+    private void Add()
+    {
+        _foodItemToAdd.Id = new();
+        _lastAddStatus = dbManager.TryInsertFoodItem(_foodItemToAdd);
+
+        OnAddComplete();
+    }
+
+    private void ClearStatus()
+    {
+        _lastAddStatus = (false, new List<string>());
+    }
+}
