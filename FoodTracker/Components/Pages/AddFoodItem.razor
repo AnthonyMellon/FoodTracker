@@ -14,18 +14,17 @@
     <h3>Modify Food Items</h3>
 
     @* Add a food item *@
-    <FoodTracker.Components.FoodStuff.FoodItemAdder OnAddComplete="LoadFoodItemsSync" />
+    <FoodTracker.Components.FoodStuff.FoodItemAdder OnAddComplete="LoadFoodItemsSync" />    
 
     @* Toggle deletes *@
     <button onclick=@ToggleAllowDeletes>Allow deletes: @_allowDeletes</button>
 
     @* Edit food items *@
-
     @if (_foodItems != null)
     {
         foreach (MongoFoodItem foodItem in _foodItems)
         {
-            <FoodTracker.Components.FoodStuff.FoodItemEditor foodItem="foodItem" /> @* TODO: Figure out why the using tag isn't working, I dont like having the full name here*@
+            <FoodTracker.Components.FoodStuff.FoodItemEditor foodItem="foodItem" /> @* TODO: Figure out why the using tag isn't working, I dont like having the full name here*@            
             if (_allowDeletes)
             {
                 <FoodTracker.Components.FoodStuff.FoodItemDeletor foodItemID="foodItem.Id" OnDeleteComplete="LoadFoodItemsSync" />

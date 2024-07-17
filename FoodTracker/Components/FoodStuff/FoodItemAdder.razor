@@ -9,32 +9,29 @@
 </header>
 <content>
     <form method="post" @onsubmit="Add" @formname="Add-New-FoodItem">
-        <AntiforgeryToken />
-        <div class="formInputs">
-            <label>
-                <div>Name:</div>
-                <InputText class="InputText" @bind-Value="_foodItemToAdd.Name"></InputText>
-            </label>
-            <label>
-                Calories:
-                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Calories"></InputNumber>
-            </label>
-            <label>
-                Protein:
-                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Protein"></InputNumber>
-            </label>
-            <label>
-                Carbs:
-                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Carbs"></InputNumber>
-            </label>
-            <label>
-                Fat:
-                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Fat"></InputNumber>
-            </label>
-        </div>
+        <AntiforgeryToken />        
+        <label>
+            Name:
+            <InputText @bind-Value="_foodItemToAdd.Name"></InputText>
+        </label>
+        <label>
+            Calories:
+            <InputNumber @bind-Value="_foodItemToAdd!.Calories"></InputNumber>
+        </label>
+        <label>
+            Protein:
+            <InputNumber @bind-Value="_foodItemToAdd!.Protein"></InputNumber>
+        </label>
+        <label>
+            Carbs:
+            <InputNumber @bind-Value="_foodItemToAdd!.Carbs"></InputNumber>
+        </label>
+        <label>
+            Fat:
+            <InputNumber @bind-Value="_foodItemToAdd!.Fat"></InputNumber>
+        </label>        
         <div>
-            <button class="Test" type="submit">Add</button>
-            <button class="btn-danger">Test</button>
+            <button type="submit">Add</button>
         </div>
     </form>
 
