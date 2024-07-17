@@ -4,39 +4,47 @@
 @* Injects *@
 @inject DBManager dbManager
 
+<header>
+    Add Food Item
+</header>
+<content>
+    <form method="post" @onsubmit="Add" @formname="Add-New-FoodItem">
+        <AntiforgeryToken />
+        <div class="formInputs">
+            <label>
+                <div>Name:</div>
+                <InputText class="InputText" @bind-Value="_foodItemToAdd.Name"></InputText>
+            </label>
+            <label>
+                Calories:
+                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Calories"></InputNumber>
+            </label>
+            <label>
+                Protein:
+                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Protein"></InputNumber>
+            </label>
+            <label>
+                Carbs:
+                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Carbs"></InputNumber>
+            </label>
+            <label>
+                Fat:
+                <InputNumber class="InputNumber" @bind-Value="_foodItemToAdd!.Fat"></InputNumber>
+            </label>
+        </div>
+        <div>
+            <button class="Test" type="submit">Add</button>
+            <button class="btn-danger">Test</button>
+        </div>
+    </form>
 
-<form method="post" @onsubmit="Add" @formname="Add-New-FoodItem">
-    <AntiforgeryToken />
     <div>
-        <label>
-            Name:
-            <InputText @bind-Value="_foodItemToAdd.Name"></InputText>
-        </label>
-        <label>
-            Calories:
-            <InputNumber @bind-Value="_foodItemToAdd!.Calories"></InputNumber>
-        </label>
-        <label>
-            Protein:
-            <InputNumber @bind-Value="_foodItemToAdd!.Protein"></InputNumber>
-        </label>
-        <label>
-            Carbs:
-            <InputNumber @bind-Value="_foodItemToAdd!.Carbs"></InputNumber>
-        </label>
-        <label>
-            Fat:
-            <InputNumber @bind-Value="_foodItemToAdd!.Fat"></InputNumber>
-        </label>
+        <FoodTracker.Components.UserFeedback.MessageDisplayer messages="_lastAddStatus.messages" ClearStatus="ClearStatus" />
     </div>
-    <div>
-        <button type="submit">Add</button>
-    </div>
-</form>
+</content>
 
-<div>
-    <FoodTracker.Components.UserFeedback.MessageDisplayer messages="_lastAddStatus.messages" ClearStatus="ClearStatus" />
-</div>
+
+
 
 @code {
     [Parameter] public Action OnAddComplete { get; set; } = () => { };
