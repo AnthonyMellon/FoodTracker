@@ -34,7 +34,7 @@
 
     private void Edit()
     {
-        _lastEditStatus = dbManager.TryUpdateFoodItem(foodItem);
+        _lastEditStatus = dbManager.FoodItemManager.TryUpdateItem(foodItem);
     }
 
     private void ClearStatus()

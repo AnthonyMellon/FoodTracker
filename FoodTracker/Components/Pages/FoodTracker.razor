@@ -65,7 +65,7 @@
     {
         SelectableFoodItems.Clear();
 
-        List<MongoFoodItem>? mongoFoodItems = dbManager.GetAllFoodItems();        
+        List<MongoFoodItem>? mongoFoodItems = dbManager.FoodItemManager.GetAllItems();        
 
         if(mongoFoodItems != null)
         {

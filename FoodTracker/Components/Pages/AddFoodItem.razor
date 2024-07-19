@@ -51,7 +51,7 @@
     Task LoadFoodItemsTask()
     {
         _foodItems?.Clear();
-        _foodItems = dbManager.GetAllFoodItems();
+        _foodItems = dbManager.FoodItemManager.GetAllItems();
         return Task.CompletedTask;
     }
 
@@ -68,7 +68,7 @@
     private void LoadFoodItemsSync()
     {
         _foodItems?.Clear();
-        _foodItems = dbManager.GetAllFoodItems();
+        _foodItems = dbManager.FoodItemManager.GetAllItems();
         StateHasChanged();
     }
 }

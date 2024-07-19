@@ -12,7 +12,9 @@ namespace FoodTracker.Scripts.DataBase
         public bool Connected => _connected && _client != null;
 
         //Collections
-        private IMongoCollection<MongoFoodItem>? _foodItemCollection;
+        public FoodItemManager FoodItemManager { get; private set; } = new FoodItemManager("FoodItems");
+        public MealsManager MealsManager { get; private set; } = new MealsManager("Meals");
+        public DaysManager DaysManager { get; private set; } = new DaysManager("Days");
 
         public DBManager(string? URIConnectionString)
         {
@@ -36,8 +38,11 @@ namespace FoodTracker.Scripts.DataBase
             if (!Connected) return;
 
             IMongoDatabase? db = _client?.GetDatabase("FoodTracker");
+            if (db == null) return;
 
-            _foodItemCollection = db?.GetCollection<MongoFoodItem>("FoodItems");
+            FoodItemManager.LoadCollection(db);
+            MealsManager.LoadCollection(db);
+            DaysManager.LoadCollection(db);
         }
         #endregion
 
@@ -92,156 +97,6 @@ namespace FoodTracker.Scripts.DataBase
                 _connected = false;
                 return false;
             }
-        }
-        #endregion
-
-        #region FoodItemStuff
-
-        /// <summary>
-        /// Get a list of all food items in the food item collection
-        /// </summary>
-        /// <returns>List of all food items in the database</returns>
-        public List<MongoFoodItem>? GetAllFoodItems()
-        {
-            if (!Connected) return null;
-
-            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Empty;
-
-            return _foodItemCollection.Find(filter).ToList();
-        }
-
-        /// <summary>
-        /// Attempt to delete a food item with <paramref name="id"/> from the food item collection
-        /// </summary>
-        /// <param name="id">The id of the food item to be deleted</param>
-        /// <returns>true / false depending on success along with a list of messages detailing what happened</returns>
-        public (bool success, List<string> messages) TryDeleteFoodItem(ObjectId id)
-        { 
-            List<string> returnMessages = new List<string>();
-
-            //Make sure we're connected before continuing
-            if(!Connected)
-            {
-                returnMessages.Add(ErrorUtils.Messages.NotConnected());
-                return (false, returnMessages);
-            }
-
-            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Eq(foodItem => foodItem.Id, id);            
-            try //Try delete the foood item
-            {
-                _foodItemCollection?.DeleteOne(filter);
-                returnMessages.Add($"Deleted {id}");
-                return (true, returnMessages);
-            }
-            catch(Exception ex) //Failed to delete the food item
-            {
-                returnMessages.Add(ex.ToString());
-                return (false, returnMessages);
-            }
-        }
-
-        /// <summary>
-        /// Attempts to insert <paramref name="foodItem"/> into the food item collection
-        /// </summary>
-        /// <param name="foodItem">The food item to be inserted</param>
-        /// <returns>true / false depending on success along with a list of messages detailing what happened</returns>
-        public (bool success, List<string> messages) TryInsertFoodItem(MongoFoodItem foodItem)
-        {
-            List<string> returnMessages = new List<string>();
-
-            if (!Connected) //Check if connected to DB
-            {
-                returnMessages.Add(ErrorUtils.Messages.NotConnected());
-                return (false, returnMessages);
-            }
-
-            //Input Validation
-            returnMessages = ValidateFoodItem(foodItem);
-
-            //If there's some return messages, validation has failed. Return all the reasons why
-            if (returnMessages.Count != 0) return (false, returnMessages);
-
-            //Input validation passed, try insert to db and see if it accepts the food item
-            try
-            {
-                _foodItemCollection?.InsertOne(foodItem);
-            }
-            catch (Exception ex) //Womp womp
-            {
-                returnMessages.Add(ex.ToString());
-                return (false, returnMessages);
-            }
-
-            //Success!
-            returnMessages.Add($"Successfully created {foodItem.Name}");
-            return (true, returnMessages);
-        }
-
-        /// <summary>
-        /// Attempts to update the food item in food items collection with matching id to <paramref name="newData"/> to match <paramref name="newData"/>
-        /// 
-        /// </summary>
-        /// <param name="newData">The food items new data</param>
-        /// <returns></returns>
-        public (bool success, List<string> messages) TryUpdateFoodItem(MongoFoodItem newData)
-        {
-            //Make sure the new data is valid
-            List<string> returnMessages = ValidateFoodItem(newData);
-            if (returnMessages.Count != 0) return (false, returnMessages);
-
-            //New data is valid
-            FilterDefinition<MongoFoodItem> filter = Builders<MongoFoodItem>.Filter.Eq(foodItem => foodItem.Id, newData.Id);
-            UpdateDefinition<MongoFoodItem> update = Builders<MongoFoodItem>.Update
-                .Set(foodItem => foodItem.Name, newData.Name)
-                .Set(fooditem => fooditem.Calories, newData.Calories)
-                .Set(foodItem => foodItem.Protein, newData.Protein)
-                .Set(foodItem => foodItem.Carbs, newData.Carbs)
-                .Set(foodItem => foodItem.Fat, newData.Fat);
-
-            try //Attempt to update food item
-            {
-                _foodItemCollection?.UpdateOne(filter, update);
-                returnMessages.Add($"Successfully updated {newData.Name}");
-                return (true, returnMessages);
-            }
-            catch (Exception ex) //Failed :(
-            {
-                returnMessages.Add(ex.ToString());
-                return (false, returnMessages);
-            }
-
-        }
-
-        /// <summary>
-        /// Ensures a food item's values are all ok
-        /// </summary>
-        /// <param name="foodItem">The food item to check</param>
-        /// <returns>A list of messages describing any issues found with <paramref name="foodItem"/></returns>
-        private List<string> ValidateFoodItem(MongoFoodItem foodItem)
-        {
-            List<string> returnMessages = new List<string>();
-
-            if (foodItem == null) //Make sure there's an acutal food item being passed in. No point in continuing if there isn't
-            {
-                returnMessages.Add(ErrorUtils.Messages.IsNull("food item"));
-                return returnMessages;
-            }
-
-            if (foodItem.Name == null) returnMessages.Add(ErrorUtils.Messages.IsNull("Name"));
-            if (foodItem.Name == "") returnMessages.Add(ErrorUtils.Messages.IsEmpty("Name"));
-            if (foodItem.Calories < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Calories"));
-            if (foodItem.Protein < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Protein"));
-            if (foodItem.Carbs < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Carbs"));
-            if (foodItem.Fat < 0) returnMessages.Add(ErrorUtils.Messages.IsNegative("Fat"));
-            if (_foodItemCollection.AsQueryable().Where( //Check to make sure there are no other food items with the same name
-                    i => i.Id != foodItem.Id && //No need to check against itself (relevant when editing a food item)
-                    i.Name == foodItem.Name
-                ).FirstOrDefault() != null)
-            {
-                returnMessages.Add(ErrorUtils.Messages.AlreadyExists("Name", foodItem.Name));
-            }
-
-            return returnMessages;
         }
         #endregion
     }

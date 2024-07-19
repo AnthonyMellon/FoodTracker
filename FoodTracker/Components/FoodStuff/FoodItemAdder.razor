@@ -52,7 +52,7 @@
     private void Add()
     {
         _foodItemToAdd.Id = new();
-        _lastAddStatus = dbManager.TryInsertFoodItem(_foodItemToAdd);
+        _lastAddStatus = dbManager.FoodItemManager.TryInsertItem(_foodItemToAdd);
 
         OnAddComplete();
     }
