@@ -1,0 +1,11 @@
+﻿@using FoodTracker.Scripts
+@using FoodTracker.Scripts.Utils
+
+<div>Calroies: @FoodItems.Sum(i => i.Calories)</div>
+<div>Protein: @FoodItems.Sum(i => i.Protein.value)@FoodUtils.MacroToUnitAbbv(Macros.Protein)</div>
+<div>Carbs: @FoodItems.Sum(i => i.Carbs.value)@FoodUtils.MacroToUnitAbbv(Macros.Carb)</div>
+<div>Fat: @FoodItems.Sum(i => i.Fat.value)@FoodUtils.MacroToUnitAbbv(Macros.Fat)</div>
+
+@code {
+    [Parameter] public List<FoodItem> FoodItems { get; set; } = new List<FoodItem>();
+}

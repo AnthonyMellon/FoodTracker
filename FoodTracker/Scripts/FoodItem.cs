@@ -1,27 +1,30 @@
 ﻿using FoodTracker.Scripts.Utils;
+using MongoDB.Bson;
 
 namespace FoodTracker.Scripts
 {
     public class FoodItem
     {
-        public string name { get; private set; }
-        public float calories { get; private set; }
-        public Macro protein { get; private set; }
-        public Macro carbs { get; private set; }
-        public Macro fat { get; private set; }
+        public ObjectId Id { get; private set; }
+        public string Name { get; private set; }
+        public float Calories { get; private set; }
+        public Macro Protein { get; private set; }
+        public Macro Carbs { get; private set; }
+        public Macro Fat { get; private set; }
 
-        public FoodItem(string name, float numCalories, float numProtein, float numCarbs, float numFat)
+        public FoodItem(ObjectId id, string name, float numCalories, float numProtein, float numCarbs, float numFat)
         {
-            this.name = name;
-            this.calories = numCalories;
-            this.protein = new Macro(Macros.Protein, numProtein);
-            this.carbs = new Macro(Macros.Carb, numCarbs);
-            this.fat = new Macro(Macros.Fat, numFat);
+            this.Id = id;
+            this.Name = name;
+            this.Calories = numCalories;
+            this.Protein = new Macro(Macros.Protein, numProtein);
+            this.Carbs = new Macro(Macros.Carb, numCarbs);
+            this.Fat = new Macro(Macros.Fat, numFat);
         }
 
         public override string ToString()
         {
-            return name.Replace('_', ' ');
+            return Name.Replace('_', ' ');
         }
     }
 }

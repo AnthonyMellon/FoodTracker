@@ -1,0 +1,16 @@
+﻿@using FoodTracker.Scripts.Utils;
+
+<InputSelect @bind-Value:get="_selectedItem" @bind-Value:set="AddItem">
+    <option value="" disabled selected>Select and Item</option>
+    @foreach(SelectableMongoItem item in Items)
+    {
+        <option value="@item.Id">@item.Name</option>
+    }
+</InputSelect>
+
+@code {
+    [Parameter] public List<SelectableMongoItem> Items { get; set; } = new List<SelectableMongoItem>();
+    [Parameter] public Action<string?> AddItem { get; set; } = (_) => { Console.WriteLine("No method passed"); };
+
+    private string? _selectedItem;
+}
