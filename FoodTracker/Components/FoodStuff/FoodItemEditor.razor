@@ -1,6 +1,7 @@
 ﻿@* Usings *@
 @using System.Text
 @using Scripts.DataBase
+@using FoodTracker.Components.UserFeedback
 
 @* Injects *@
 @inject DBManager dbManager
@@ -23,7 +24,7 @@
         <button type="submit">Save Changes</button>  
                
     </form>
-    <FoodTracker.Components.UserFeedback.MessageDisplayer messages="_lastEditStatus.messages" ClearStatus="ClearStatus"/>
+    <MessageDisplayer messages="_lastEditStatus.messages" ClearStatus="ClearStatus"/>
 }
 
 

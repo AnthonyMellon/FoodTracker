@@ -1,5 +1,6 @@
 ﻿@* Usings *@
 @using Scripts.DataBase;
+@using FoodTracker.Components.UserFeedback
 
 @* Injects *@
 @inject DBManager dbManager
@@ -36,7 +37,7 @@
     </form>
 
     <div>
-        <FoodTracker.Components.UserFeedback.MessageDisplayer messages="_lastAddStatus.messages" ClearStatus="ClearStatus" />
+        <MessageDisplayer messages="_lastAddStatus.messages" ClearStatus="ClearStatus" />
     </div>
 </content>
 

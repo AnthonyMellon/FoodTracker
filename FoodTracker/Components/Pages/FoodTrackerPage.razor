@@ -6,6 +6,8 @@
 @using global::FoodTracker.Scripts.DataBase
 @using global::FoodTracker.Scripts.Utils
 @using MongoDB.Bson
+@using FoodTracker.Components.Utils
+@using FoodTracker.Components.FoodStuff
 
 @* Injects *@
 @inject DBManager dbManager
@@ -16,16 +18,11 @@
 
 <h3>Welcome to your food tracker</h3>
 
-<!-- Add food items to the list -->
-<FoodTracker.Components.Utils.ItemSelector Items="@_selectableFoodItems" AddItem="@AddSelectedFood"></FoodTracker.Components.Utils.ItemSelector>
-
-<!-- List each food item added to the list -->
-<FoodTracker.Components.FoodStuff.FoodItemLister foodItems="_selectedFoodItems"></FoodTracker.Components.FoodStuff.FoodItemLister>
-
-<!-- Disaply totals -->
+<ItemSelector Items="@_selectableFoodItems" AddItem="@AddSelectedFood" />
+<FoodItemLister foodItems="_selectedFoodItems" />
 <div>
     <label>Totals</label>
-    <FoodTracker.Components.FoodStuff.TotalMacroDisplayer FoodItems="_selectedFoodItems"></FoodTracker.Components.FoodStuff.TotalMacroDisplayer>
+    <TotalMacroDisplayer FoodItems="_selectedFoodItems" />
 </div>
 
 @code

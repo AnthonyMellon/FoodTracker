@@ -1,12 +1,13 @@
 ﻿@* Usings *@
 @using MongoDB.Bson
 @using Scripts.DataBase
+@using FoodTracker.Components.UserFeedback
 
 @* Injects *@
 @inject DBManager dbManager
 
 <button @onclick="Delete">Delete</button>
-<FoodTracker.Components.UserFeedback.MessageDisplayer messages="_lastDeleteStatus.messages" ClearStatus="ClearStatus"/>
+<MessageDisplayer messages="_lastDeleteStatus.messages" ClearStatus="ClearStatus"/>
 
 @code {
     [Parameter] public ObjectId foodItemID { get; set; }
