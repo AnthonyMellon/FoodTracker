@@ -5,7 +5,7 @@ using System.Security.Cryptography.Xml;
 
 namespace FoodTracker.Scripts.DataBase
 {
-    public class FoodItemManager(string collectionName) : CollectionManager<MongoFoodItem>(collectionName)
+    public class FoodItemManager(string collectionName, IMongoDatabase db) : CollectionManager<MongoFoodItem>(collectionName, db)
     {
         protected override List<string> validateData(MongoFoodItem data)
         {
@@ -43,6 +43,30 @@ namespace FoodTracker.Scripts.DataBase
                 .Set(oldData => oldData.Protein, newData.Protein)
                 .Set(oldData => oldData.Carbs, newData.Carbs)
                 .Set(oldData => oldData.Fat, newData.Fat);
+        }
+
+        /// <summary>
+        /// Get a list of all items in the collection as FoodItems rather than MongoFoodItems
+        /// </summary>
+        /// <returns>List of all items in the collection as FoodItems</returns>
+        public virtual async Task<List<FoodItem>> GetAllFoodItems()
+        {
+            List<MongoFoodItem> mongoItems = await GetAllItems();
+
+            List<FoodItem> foodItems = [];
+            foreach(MongoFoodItem item in mongoItems)
+            {
+                foodItems.Add(new FoodItem(
+                    item.Id,
+                    item.Name,
+                    item.Calories,
+                    item.Protein,
+                    item.Carbs,
+                    item.Fat
+                ));
+            }
+
+            return foodItems;
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace FoodTracker.Scripts.DataBase
 {
-    public class DaysManager(string collectionName) : CollectionManager<MongoDay>(collectionName)
+    public class DaysManager(string collectionName, IMongoDatabase db) : CollectionManager<MongoDay>(collectionName, db)
     {
         protected override List<string> validateData(MongoDay data)
         {

@@ -2,7 +2,7 @@
 
 namespace FoodTracker.Scripts.DataBase
 {
-    public class MealsManager(string collectionName) : CollectionManager<MongoMeal>(collectionName)
+    public class MealsManager(string collectionName, IMongoDatabase db) : CollectionManager<MongoMeal>(collectionName, db)
     {
         protected override List<string> validateData(MongoMeal data)
         {

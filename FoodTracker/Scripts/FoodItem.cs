@@ -1,4 +1,5 @@
 ﻿using FoodTracker.Scripts.Utils;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using MongoDB.Bson;
 
 namespace FoodTracker.Scripts
@@ -20,6 +21,17 @@ namespace FoodTracker.Scripts
             this.Protein = new Macro(Macros.Protein, numProtein);
             this.Carbs = new Macro(Macros.Carb, numCarbs);
             this.Fat = new Macro(Macros.Fat, numFat);
+        }
+
+        public FoodItem(ObjectId id, string name, double numCalories, double numProtein, double numCarbs, double numFat)
+        {
+            Id = id;
+            Name = name;
+            Calories = (float)numCalories;
+            Protein = new Macro(Macros.Protein, (float)numProtein);
+            Carbs = new Macro(Macros.Carb, (float)numCarbs);
+            Fat = new Macro(Macros.Fat, (float)numFat);
+
         }
 
         public override string ToString()

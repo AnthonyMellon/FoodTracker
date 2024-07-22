@@ -28,44 +28,27 @@
 @code
 {
     public string? selectedFood { get; private set; }
-    private List<FoodItem> _foodItems = new List<FoodItem>();
-    private List<SelectableMongoItem> _selectableFoodItems = new List<SelectableMongoItem>();
+    private List<FoodItem> _allFoodItems = new List<FoodItem>();
     private List<FoodItem> _selectedFoodItems = new List<FoodItem>();
+    private List<SelectableMongoItem> _selectableFoodItems = new List<SelectableMongoItem>();
 
     private void AddSelectedFood(string selected)
     {
         //Find and add the selected food item
-        FoodItem? selectedItem = (_foodItems.Find(e => e.Id.ToString() == selected));
+        FoodItem? selectedItem = (_allFoodItems.Find(e => e.Id.ToString() == selected));
         if (selectedItem != null) _selectedFoodItems.Add(selectedItem);
     }
 
-    Task LoadSelectableFoodItems()
+    private async void LoadFoodItems()
     {
-        _foodItems.Clear();
-
-        List<MongoFoodItem>? mongoFoodItems = dbManager.FoodItemManager.GetAllItems();        
-
-        if(mongoFoodItems != null)
-        {
-            foreach (MongoFoodItem foodItem in mongoFoodItems) //Convert all the mongoFoodItems to foodItems
-            {
-                _foodItems.Add(new FoodItem(
-                    foodItem.Id,
-                    foodItem.Name,
-                    (float)foodItem.Calories,
-                    (float)foodItem.Protein,
-                    (float)foodItem.Carbs,
-                    (float)foodItem.Fat
-            ));}
-        }
-
-        _selectableFoodItems = _foodItems.Select(i => new SelectableMongoItem(i.Id, i.Name)).ToList();
-
-        return Task.CompletedTask;
+        _allFoodItems = await dbManager.FoodItemManager.GetAllFoodItems();
+        _selectableFoodItems = _allFoodItems.Select(i => new SelectableMongoItem(i.Id, i.Name)).ToList();
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadSelectableFoodItems();
+        await Task.Delay(1);
+        LoadFoodItems();
     }
 }
