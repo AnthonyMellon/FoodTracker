@@ -13,7 +13,7 @@
 <content>    
     <h3>Modify Food Items</h3>
     
-    <FoodItemAdder OnAddComplete="LoadFoodItemsSync" />    
+    <FoodItemAdder OnAddComplete="LoadFoodItems" />    
 
     @* Toggle deletes *@
     <button onclick=@ToggleAllowDeletes>Allow deletes: @_allowDeletes</button>
@@ -26,7 +26,7 @@
             <FoodItemEditor foodItem="foodItem" />
             if (_allowDeletes)
             {
-                <FoodItemDeletor foodItemID="foodItem.Id" OnDeleteComplete="LoadFoodItemsSync" />
+                <FoodItemDeletor foodItemID="foodItem.Id" OnDeleteComplete="LoadFoodItems" />
             }
 
         }
