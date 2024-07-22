@@ -38,7 +38,7 @@
 @code {
     [SupplyParameterFromForm]
     private MongoFoodItem? _foodItemToAdd { get; set; } = new MongoFoodItem();
-    private List<MongoFoodItem>? _foodItems = new List<MongoFoodItem>();
+    private List<MongoFoodItem> _foodItems = new List<MongoFoodItem>();
 
     private bool _allowDeletes = false;
 
@@ -47,27 +47,17 @@
         _allowDeletes = !_allowDeletes;
     }
 
-    Task LoadFoodItemsTask()
+    private async void LoadFoodItems()
     {
-        _foodItems?.Clear();
-        _foodItems = dbManager.FoodItemManager.GetAllItems();
-        return Task.CompletedTask;
+        _foodItems.Clear();
+        _foodItems = await dbManager.FoodItemManager.GetAllItems();
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadFoodItems();
-    }
+        await Task.Delay(1);
 
-    private async Task LoadFoodItems()
-    {
-        await LoadFoodItemsTask();
-    }
-
-    private void LoadFoodItemsSync()
-    {
-        _foodItems?.Clear();
-        _foodItems = dbManager.FoodItemManager.GetAllItems();
-        StateHasChanged();
+        LoadFoodItems();
     }
 }
