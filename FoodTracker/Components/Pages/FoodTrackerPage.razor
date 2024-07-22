@@ -32,6 +32,11 @@
     private List<FoodItem> _selectedFoodItems = new List<FoodItem>();
     private List<SelectableMongoItem> _selectableFoodItems = new List<SelectableMongoItem>();
 
+
+    /// <summary>
+    /// Add a food item to the list of selected food items
+    /// </summary>
+    /// <param name="selected">The id of the food item to add</param>
     private void AddSelectedFood(string selected)
     {
         //Find and add the selected food item
@@ -39,6 +44,10 @@
         if (selectedItem != null) _selectedFoodItems.Add(selectedItem);
     }
 
+    /// <summary>
+    /// Removes a food item from the list of selected food items
+    /// </summary>
+    /// <param name="foodItem">The food item to be removed</param>
     private void RemoveSelectedFood(FoodItem foodItem)
     {
         _selectedFoodItems.Remove(foodItem);

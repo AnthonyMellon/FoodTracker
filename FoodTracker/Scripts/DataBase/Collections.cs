@@ -20,7 +20,7 @@ namespace FoodTracker.Scripts.DataBase
     public class MongoMeal : CollectionBase
     {
         public string? Name { get; set; }
-        public ObjectId[]? foodItems { get; set; }        
+        public ObjectId[]? FoodItems { get; set; }        
     }
     
     public class MongoDay : CollectionBase

@@ -1,0 +1,105 @@
+﻿@page "/MealCreator"
+@rendermode InteractiveServer
+
+@* Usings *@
+@using FoodTracker.Components.FoodStuff
+@using FoodTracker.Components.Utils
+@using FoodTracker.Scripts
+@using FoodTracker.Scripts.DataBase
+@using FoodTracker.Scripts.Utils
+@using MongoDB.Bson
+@using FoodTracker.Components.UserFeedback
+
+@* Injects *@
+@inject DBManager dbManager
+
+<PageTitle>Meal Creator</PageTitle>
+
+<content>
+    <h3>Create a Meal</h3>
+
+    <form method="post" @onsubmit="CreateMeal" @formname="Create-New-Meal">
+        <AntiforgeryToken />
+        <label>
+            Name:
+            <InputText @bind-Value="_mealItemToAdd.Name"></InputText>
+        </label>
+        <label>
+            Ingredients
+            <ItemSelector Items=_selectableFoodItems AddItem="(AddSelectedFood)"></ItemSelector>
+            <FoodItemLister foodItems="_selectedFoodItems" removeFoodItem="RemoveSelectedFood"></FoodItemLister>
+        </label>
+
+        <button type="submit">Create</button>
+    </form>
+
+    <div>        
+        <MessageDisplayer messages="_lastAddStatus.messages" ClearStatus="ClearStatus"></MessageDisplayer>
+    </div>
+
+</content>
+
+@code {
+    private List<FoodItem> _allFoodItems = new List<FoodItem>();
+    private List<FoodItem> _selectedFoodItems = new List<FoodItem>();
+    private List<SelectableMongoItem> _selectableFoodItems = new List<SelectableMongoItem>();
+    private (bool success, List<string> messages) _lastAddStatus = (false, new List<string>());
+
+    private MongoMeal _mealItemToAdd { get; set; } = new MongoMeal();
+
+    private async void CreateMeal()
+    {
+        Console.WriteLine("Creating a meal");
+
+        ObjectId[] foodIds = _selectedFoodItems.Select(i => i.Id).ToArray();
+        _mealItemToAdd.FoodItems = foodIds;
+
+        _mealItemToAdd.Id = new();
+        _lastAddStatus = await dbManager.MealsManager.TryInsertItem(_mealItemToAdd);
+
+        if(_lastAddStatus.success)
+        {
+            _selectedFoodItems.Clear();
+        }
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Add a food item to the list of selected food items
+    /// </summary>
+    /// <param name="selected">The id of the food item to add</param>
+    private void AddSelectedFood(string selected)
+    {
+        FoodItem? selectedFood = _allFoodItems.Find(i => i.Id.ToString() == selected);
+        if (selectedFood != null) _selectedFoodItems.Add(selectedFood);
+    }
+
+    /// <summary>
+    /// Removes a food item from the list of selected food items
+    /// </summary>
+    /// <param name="foodItem">The food item to be removed</param>
+    private void RemoveSelectedFood(FoodItem foodItem)
+    {
+        _selectedFoodItems.Remove(foodItem);
+        StateHasChanged();
+    }
+
+    private void ClearStatus()
+    {
+        _lastAddStatus = (false, new List<string>());
+    }
+
+
+    private async void LoadFoodItems()
+    {
+        _allFoodItems = await dbManager.FoodItemManager.GetAllFoodItems();
+        _selectableFoodItems = _allFoodItems.Select(i => new SelectableMongoItem(i.Id, i.Name)).ToList();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(1);
+        LoadFoodItems();
+    }
+}
