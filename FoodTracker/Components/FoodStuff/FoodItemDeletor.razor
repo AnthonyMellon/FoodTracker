@@ -15,10 +15,9 @@
 
     private (bool success, List<string> messages) _lastDeleteStatus = (false, new List<string>());    
 
-    private void Delete()
+    private async void Delete()
     {
-        _lastDeleteStatus = dbManager.FoodItemManager.TryDeleteItem(foodItemID);
-
+        _lastDeleteStatus = await dbManager.FoodItemManager.TryDeleteItem(foodItemID);
         OnDeleteComplete();
     }
 

@@ -5,30 +5,22 @@ namespace FoodTracker.Scripts.DataBase
 {
     public abstract class CollectionManager<T> where T: CollectionBase
     {
-        protected IMongoCollection<T>? _collection;
-        protected string _collectionName;
+        protected IMongoCollection<T> _collection;        
 
-        public CollectionManager(string collectionName)
+        public CollectionManager(string collectionName, IMongoDatabase db)
         {
-            _collectionName = collectionName;
-        }
-
-        public virtual void LoadCollection(IMongoDatabase db)
-        {
-            _collection = db.GetCollection<T>(_collectionName);
+            _collection = db.GetCollection<T>(collectionName);
         }
 
         /// <summary>
         /// Get a list of all items in the collection
         /// </summary>
         /// <returns>List of all items in the collection</returns>
-        public virtual List<T> GetAllItems()
+        public virtual async Task<List<T>> GetAllItems()
         {
-            Console.WriteLine(typeof(T));
-
             FilterDefinition<T> filter = Builders<T>.Filter.Empty;
 
-            return _collection.Find(filter).ToList();
+            return await _collection.Find(filter).ToListAsync();
         }
 
         /// <summary>
@@ -36,14 +28,14 @@ namespace FoodTracker.Scripts.DataBase
         /// </summary>
         /// <param name="id">The id of the item to be deleted</param>
         /// <returns>true / false depending on success along with a list of messages detailing what happened</returns>
-        public virtual (bool success, List<string> messages) TryDeleteItem(ObjectId id)
+        public virtual async Task<(bool success, List<string> messages)> TryDeleteItem(ObjectId id)
         {
             List<string> returnMessages = new List<string>();
 
             FilterDefinition<T> filter = Builders<T>.Filter.Eq(item => item.Id, id);
             try //Try delete the food item
             {
-                _collection?.DeleteOne(filter);
+                await _collection.DeleteOneAsync(filter);                
                 returnMessages.Add($"Deleted {id}");
                 return (true, returnMessages);
             }
@@ -59,7 +51,7 @@ namespace FoodTracker.Scripts.DataBase
         /// </summary>
         /// <param name="item">The item to be inserted</param>
         /// <returns>true / false depending on success along with a list of messages detailing what happened</returns>
-        public virtual (bool success, List<string> messages) TryInsertItem(T item)
+        public virtual async Task<(bool success, List<string> messages)> TryInsertItem(T item)
         {
             List<string> returnMessages = new List<string>();
 
@@ -72,7 +64,7 @@ namespace FoodTracker.Scripts.DataBase
             //Data is valid, try insert to db and see if it accepts
             try
             {
-                _collection?.InsertOne(item);
+                await _collection.InsertOneAsync(item);
             }
             catch (Exception ex) //Womp womp
             {
@@ -90,7 +82,7 @@ namespace FoodTracker.Scripts.DataBase
         /// </summary>
         /// <param name="newData">The new data</param>
         /// <returns>true / false depending on success along with a list of messages detailing what happened</returns>
-        public virtual (bool success, List<string> messages) TryUpdateItem(T newData)
+        public virtual async Task<(bool success, List<string> messages)> TryUpdateItem(T newData)
         {
             List<string> returnMessages = new List<string>();
 
@@ -104,7 +96,7 @@ namespace FoodTracker.Scripts.DataBase
 
             try //Attempt to update item
             {
-                _collection?.UpdateOne(filter, update);
+                await _collection.UpdateOneAsync(filter, update);
                 returnMessages.Add($"Successfully updated {newData.Id}");
                 return (true, returnMessages);
             }

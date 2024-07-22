@@ -12,9 +12,9 @@ namespace FoodTracker.Scripts.DataBase
         public bool Connected => _connected && _client != null;
 
         //Collections
-        public FoodItemManager FoodItemManager { get; private set; } = new FoodItemManager("FoodItems");
-        public MealsManager MealsManager { get; private set; } = new MealsManager("Meals");
-        public DaysManager DaysManager { get; private set; } = new DaysManager("Days");
+        public FoodItemManager FoodItemManager { get; private set; }
+        public MealsManager MealsManager { get; private set; }
+        public DaysManager DaysManager { get; private set; }
 
         public DBManager(string? URIConnectionString)
         {
@@ -40,9 +40,9 @@ namespace FoodTracker.Scripts.DataBase
             IMongoDatabase? db = _client?.GetDatabase("FoodTracker");
             if (db == null) return;
 
-            FoodItemManager.LoadCollection(db);
-            MealsManager.LoadCollection(db);
-            DaysManager.LoadCollection(db);
+            FoodItemManager = new FoodItemManager("FoodItems", db);
+            MealsManager = new MealsManager("Meals", db);
+            DaysManager = new DaysManager("Days", db);
         }
         #endregion
 

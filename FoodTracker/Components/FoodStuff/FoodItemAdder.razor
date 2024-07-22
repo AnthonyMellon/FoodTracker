@@ -50,10 +50,10 @@
     private (bool success, List<string> messages) _lastAddStatus = (false, new List<string>());
     private MongoFoodItem _foodItemToAdd { get; set; } = new MongoFoodItem();
 
-    private void Add()
+    private async void Add()
     {
         _foodItemToAdd.Id = new();
-        _lastAddStatus = dbManager.FoodItemManager.TryInsertItem(_foodItemToAdd);
+        _lastAddStatus = await dbManager.FoodItemManager.TryInsertItem(_foodItemToAdd);
 
         OnAddComplete();
     }

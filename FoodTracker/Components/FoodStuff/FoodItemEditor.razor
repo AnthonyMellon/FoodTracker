@@ -33,9 +33,9 @@
     [Parameter] public MongoFoodItem foodItem { get; set; } = new MongoFoodItem();
     private (bool success, List<string> messages) _lastEditStatus = (false, new List<string>());
 
-    private void Edit()
+    private async void Edit()
     {
-        _lastEditStatus = dbManager.FoodItemManager.TryUpdateItem(foodItem);
+        _lastEditStatus = await dbManager.FoodItemManager.TryUpdateItem(foodItem);
     }
 
     private void ClearStatus()
