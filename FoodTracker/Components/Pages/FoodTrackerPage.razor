@@ -19,7 +19,7 @@
 <h3>Welcome to your food tracker</h3>
 
 <ItemSelector Items="@_selectableFoodItems" AddItem="@AddSelectedFood" />
-<FoodItemLister foodItems="_selectedFoodItems" />
+<FoodItemLister foodItems="_selectedFoodItems" removeFoodItem="RemoveSelectedFood"/>
 <div>
     <label>Totals</label>
     <TotalMacroDisplayer FoodItems="_selectedFoodItems" />
@@ -37,6 +37,12 @@
         //Find and add the selected food item
         FoodItem? selectedItem = (_allFoodItems.Find(e => e.Id.ToString() == selected));
         if (selectedItem != null) _selectedFoodItems.Add(selectedItem);
+    }
+
+    private void RemoveSelectedFood(FoodItem foodItem)
+    {
+        _selectedFoodItems.Remove(foodItem);
+        StateHasChanged();
     }
 
     private async void LoadFoodItems()

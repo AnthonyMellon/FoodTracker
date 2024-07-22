@@ -1,6 +1,7 @@
 ﻿@using FoodTracker.Scripts
 @using FoodTracker.Scripts.Utils
 
+
 @foreach (FoodItem foodItem in foodItems)
 {
     <div>
@@ -9,10 +10,13 @@
         <div>Protein: @foodItem.Protein.value@FoodUtils.MacroToUnitAbbv(Macros.Protein)</div>
         <div>Carbs: @foodItem.Carbs.value@FoodUtils.MacroToUnitAbbv(Macros.Carb)</div>
         <div>Fat: @foodItem.Fat.value@FoodUtils.MacroToUnitAbbv(Macros.Fat)</div>
-    </div>
+    </div>   
+
+    <button onclick="@(() => {removeFoodItem(foodItem);})">remove</button>
     <hr />
 }
 
 @code {
     [Parameter] public List<FoodItem> foodItems { get; set; } = new List<FoodItem>();
+    [Parameter] public Action<FoodItem> removeFoodItem { get; set; } = (_) => { };
 }
